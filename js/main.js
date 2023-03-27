@@ -130,6 +130,29 @@ const movementHandler = (e) => {
     }
 }
 
+//////////////////Collision Detection//////////////////////
+// Detect hit between entities
+// account for the entire space that one entity takes up
+// use player and ogre x, y, height and width
+
+const detectHit = () => {
+    if (player.x < ogre.x + ogre.width
+        && player.x + player.width > ogre.x
+        && player.y < ogre.y + ogre.height
+        && player.y + player.height > ogre.y) {
+            ogre.alive = false
+            console.log('Hit!!')
+            console.log('player x', player.x)
+            console.log('player y', player.y)
+            console.log('player width', player.width)
+            console.log('player height', player.height)
+            console.log('ogre x', ogre.x)
+            console.log('ogre y', ogre.y)
+            console.log('ogre width', ogre.width)
+            console.log('ogre height', ogre.height)
+            status.textContent = "Hit!!"
+    }
+}
 
 //////////////////////Game Loop///////////////////////////
 
@@ -140,15 +163,18 @@ const movementHandler = (e) => {
 
 const gameLoop = () => {
     // To resemble movement, we should clear the old canvas every loop
-
+    if (ogre.alive) {
+        detectHit()
+    }
     ctx.clearRect(0, 0, game.width, game.height)
-    
+
     player.render()
     movement.textContent = `${player.x}, ${player.y}`
 
     if (ogre.alive) {
         ogre.render()
     }
+
 }
 // Event listener with the DOMContent loads, run the game on an interval 
 // Eventually this event will have more in it
