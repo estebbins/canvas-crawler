@@ -100,6 +100,34 @@ const movementHandler = (e) => {
     // here are somebasic key codes
     // w = 87, a = 65, s = 83, d = 68
     // up = 38, left = 37, down = 40, right = 39
+    console.log('this is e', e.keyCode)
+    // Conditional statements - if keycode === something, do something if === something else
+    // Switch case or giant if statement
+    // Switch is the condition, and it opens up for a multitude of cases
+    switch (e.keyCode) {
+        // move up
+        case (87):
+        case (38):
+            // this moves player up 10px every press
+            player.y -= 10
+            // Need a break so can move to another case if necessary
+            break
+        // Move left
+        case (65):
+        case (37):
+            player.x -= 10
+            break
+        // move down
+        case (83):
+        case (40):
+            player.y += 10
+            break
+        // move right
+        case (68): 
+        case (39):
+            player.x += 10
+            break
+    }
 }
 
 
@@ -111,6 +139,10 @@ const movementHandler = (e) => {
 // this is how we will animate our game
 
 const gameLoop = () => {
+    // To resemble movement, we should clear the old canvas every loop
+
+    ctx.clearRect(0, 0, game.width, game.height)
+    
     player.render()
     movement.textContent = `${player.x}, ${player.y}`
 
@@ -122,5 +154,8 @@ const gameLoop = () => {
 // Eventually this event will have more in it
 
 document.addEventListener('DOMContentLoaded', function () {
-    setInterval(gameLoop, 60000)
+    // Link movement handler event
+    document.addEventListener('keydown', movementHandler)
+    // Game loop interval
+    setInterval(gameLoop, 60)
 })
