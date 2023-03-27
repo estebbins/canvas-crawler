@@ -72,14 +72,14 @@ game.height = 400
 
 // Because those objects are basically the same, we can create a class to keep our code dry. 
 //////////////////////Crawler Class///////////////////////////
-class Crawler {
+class Ogre {
     constructor (x, y, width, height, color) {
-        this.x = x, 
-        this.y = y, 
-        this.width = width, 
-        this.height = height, 
-        this.color = color,
-        this.alive = true, 
+        this.x = x 
+        this.y = y
+        this.width = width
+        this.height = height
+        this.color = color
+        this.alive = true
         this.render = function () {
             ctx.fillStyle = this.color
             ctx.fillRect(this.x, this.y, this.width, this.height)
@@ -87,48 +87,117 @@ class Crawler {
     }
 }
 
-const player = new Crawler(10, 10, 16, 16, 'lightsteelblue')
-const ogre = new Crawler(200, 50, 32, 48, '#bada55')
+class Hero {
+    constructor (x, y, width, height, color) {
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+        this.color = color
+        this.alive = true 
+        this.speed = 15
+        this.direction = {
+            up: false, 
+            down: false, 
+            left: false, 
+            right: false
+        }
+        // Two other methods tied to key events
+        // One sets the direction, which sends our hero flying in that direction
+        this.setDirection = function (key) {
+            console.log('this is the key in setDirection', key)
+            if (key.toLowerCase() == 'w') { this.direction.up = true }
+            if (key.toLowerCase() == 'a') { this.direction.left = true }
+            if (key.toLowerCase() == 's') { this.direction.down = true }
+            if (key.toLowerCase() == 'd') { this.direction.right = true }
+        }
+                // The other unsets the direction, which stops our hero from moving in that direction
+        this.unsetDirection = function (key) {
+            console.log('this is the key in unsetDirection', key)
+            if (key.toLowerCase() == 'w') { this.direction.up = false }
+            if (key.toLowerCase() == 'a') { this.direction.left = false }
+            if (key.toLowerCase() == 's') { this.direction.down = false }
+            if (key.toLowerCase() == 'd') { this.direction.right = false }
+        }
+        this.movePlayer = function () {
+            // send the player flying in whatever direction is true
+            if (this.direction.up) {
+                this.y -= this.speed
+                if (this.y <= 0) {
+                    this.y = 0
+                }
+            }
+            if (this.direction.left) {
+                this.x -= this.speed
+                if (this.x <= 0) {
+                    this.x = 0
+                }
+            }
+            if (this.direction.down) {
+                this.y += this.speed
+                if (this.y + this.height >= game.height) {
+                    this.y = game.height - this.height
+                }
+            }
+            if (this.direction.right) {
+                this.x += this.speed
+                if (this.x + this.width >= game.width) {
+                    this.x = game.width - this.width
+                }
+            }
+        }
+
+        this.render = function () {
+            ctx.fillStyle = this.color
+            ctx.fillRect(this.x, this.y, this.width, this.height)
+        }
+    }
+}
+
+
+const player = new Hero(10, 10, 16, 16, 'lightsteelblue')
+const ogre = new Ogre(200, 50, 32, 48, '#bada55')
 
 // player.render()
 // ogre.render()
 
 //////////////////////Movement Handler///////////////////////////
-const movementHandler = (e) => {
-    // here the e is standing for 'event' => specidically will be a keydown
-    // We're going to use keyCodes to tell it to do different movements for diff keys
-    // here are somebasic key codes
-    // w = 87, a = 65, s = 83, d = 68
-    // up = 38, left = 37, down = 40, right = 39
-    console.log('this is e', e.keyCode)
-    // Conditional statements - if keycode === something, do something if === something else
-    // Switch case or giant if statement
-    // Switch is the condition, and it opens up for a multitude of cases
-    switch (e.keyCode) {
-        // move up
-        case (87):
-        case (38):
-            // this moves player up 10px every press
-            player.y -= 10
-            // Need a break so can move to another case if necessary
-            break
-        // Move left
-        case (65):
-        case (37):
-            player.x -= 10
-            break
-        // move down
-        case (83):
-        case (40):
-            player.y += 10
-            break
-        // move right
-        case (68): 
-        case (39):
-            player.x += 10
-            break
-    }
-}
+// NOW HANDLED IN CLASS
+// const movementHandler = (e) => {
+//     // here the e is standing for 'event' => specidically will be a keydown
+//     // We're going to use keyCodes to tell it to do different movements for diff keys
+//     // here are somebasic key codes
+//     // w = 87, a = 65, s = 83, d = 68
+//     // up = 38, left = 37, down = 40, right = 39
+//     console.log('this is e', e.keyCode)
+//     // Conditional statements - if keycode === something, do something if === something else
+//     // Switch case or giant if statement
+//     // Switch is the condition, and it opens up for a multitude of cases
+//     switch (e.keyCode) {
+//         // move up
+//         case (87):
+//         case (38):
+//             // this moves player up 10px every press
+//             player.y -= 10
+//             // Need a break so can move to another case if necessary
+//             break
+//         // Move left
+//         case (65):
+//         case (37):
+//             player.x -= 10
+//             break
+//         // move down
+//         case (83):
+//         case (40):
+//             player.y += 10
+//             break
+//         // move right
+//         case (68): 
+//         case (39):
+//             player.x += 10
+//             break
+//     }
+// }
 
 //////////////////Collision Detection//////////////////////
 // Detect hit between entities
@@ -169,6 +238,7 @@ const gameLoop = () => {
     ctx.clearRect(0, 0, game.width, game.height)
 
     player.render()
+    player.movePlayer()
     movement.textContent = `${player.x}, ${player.y}`
 
     if (ogre.alive) {
@@ -176,12 +246,24 @@ const gameLoop = () => {
     }
 
 }
+
+//////////////////////Event Listeners///////////////////////////
+// One key event for a keydown, which sets player direction
+document.addEventListener('keydown', (e) => {
+    player.setDirection(e.key)
+})
+// Another for keyup, which removes player direction
+document.addEventListener('keyup', (e) => {
+    if(['w', 'a', 's', 'd'].includes(e.key))
+        player.unsetDirection(e.key)
+})
+
 // Event listener with the DOMContent loads, run the game on an interval 
 // Eventually this event will have more in it
 
 document.addEventListener('DOMContentLoaded', function () {
     // Link movement handler event
-    document.addEventListener('keydown', movementHandler)
+
     // Game loop interval
     setInterval(gameLoop, 60)
 })
