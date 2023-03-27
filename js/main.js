@@ -157,6 +157,7 @@ class Hero {
 
 const player = new Hero(10, 10, 16, 16, 'lightsteelblue')
 const ogre = new Ogre(200, 50, 32, 48, '#bada55')
+const ogre2 = new Ogre(500, 50, 64, 96, 'red')
 
 // player.render()
 // ogre.render()
@@ -204,21 +205,21 @@ const ogre = new Ogre(200, 50, 32, 48, '#bada55')
 // account for the entire space that one entity takes up
 // use player and ogre x, y, height and width
 
-const detectHit = () => {
-    if (player.x < ogre.x + ogre.width
-        && player.x + player.width > ogre.x
-        && player.y < ogre.y + ogre.height
-        && player.y + player.height > ogre.y) {
-            ogre.alive = false
+const detectHit = (thing) => {
+    if (player.x < thing.x + thing.width
+        && player.x + player.width > thing.x
+        && player.y < thing.y + thing.height
+        && player.y + player.height > thing.y) {
+            thing.alive = false
             console.log('Hit!!')
             console.log('player x', player.x)
             console.log('player y', player.y)
             console.log('player width', player.width)
             console.log('player height', player.height)
-            console.log('ogre x', ogre.x)
-            console.log('ogre y', ogre.y)
-            console.log('ogre width', ogre.width)
-            console.log('ogre height', ogre.height)
+            console.log('ogre x', thing.x)
+            console.log('ogre y', thing.y)
+            console.log('ogre width', thing.width)
+            console.log('ogre height', thing.height)
             status.textContent = "Hit!!"
     }
 }
@@ -232,19 +233,21 @@ const detectHit = () => {
 
 const gameLoop = () => {
     // To resemble movement, we should clear the old canvas every loop
-    if (ogre.alive) {
-        detectHit()
-    }
     ctx.clearRect(0, 0, game.width, game.height)
+
+    if (ogre.alive) {
+        ogre.render()
+        detectHit(ogre)
+    } else if (ogre2.alive) {
+        ogre2.render()
+        detectHit(ogre2)
+    } else {
+        stopGameLoop()
+    }
 
     player.render()
     player.movePlayer()
     movement.textContent = `${player.x}, ${player.y}`
-
-    if (ogre.alive) {
-        ogre.render()
-    }
-
 }
 
 //////////////////////Event Listeners///////////////////////////
@@ -258,12 +261,14 @@ document.addEventListener('keyup', (e) => {
         player.unsetDirection(e.key)
 })
 
+const gameInterval = setInterval(gameLoop, 60)
+
+const stopGameLoop = () => { clearInterval(gameInterval) }
 // Event listener with the DOMContent loads, run the game on an interval 
 // Eventually this event will have more in it
 
 document.addEventListener('DOMContentLoaded', function () {
     // Link movement handler event
-
+    gameInterval
     // Game loop interval
-    setInterval(gameLoop, 60)
 })
